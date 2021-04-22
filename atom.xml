@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://lienguang0624.github.io/</id>
     <title>LightHunter</title>
-    <updated>2021-04-22T06:35:18.020Z</updated>
+    <updated>2021-04-22T07:02:59.434Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://lienguang0624.github.io/"/>
     <link rel="self" href="https://lienguang0624.github.io/atom.xml"/>
@@ -11,12 +11,17 @@
     <icon>https://lienguang0624.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, LightHunter</rights>
     <entry>
-        <title type="html"><![CDATA[test]]></title>
+        <title type="html"><![CDATA[Markdown用法简介]]></title>
         <id>https://lienguang0624.github.io/post/test/</id>
         <link href="https://lienguang0624.github.io/post/test/">
         </link>
         <updated>2021-04-22T06:35:05.000Z</updated>
-        <content type="html"><![CDATA[<p>hello</p>
+        <content type="html"><![CDATA[<figure data-type="image" tabindex="1"><img src="https://lienguang0624.github.io//post-images/1619074934307.jpg" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="2"><img src="https://lienguang0624.github.io//post-images/1619074942951.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="3"><img src="https://lienguang0624.github.io//post-images/1619074947111.jpg" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="4"><img src="https://lienguang0624.github.io//post-images/1619074951564.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="5"><img src="https://lienguang0624.github.io//post-images/1619074955112.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="6"><img src="https://lienguang0624.github.io//post-images/1619074958798.png" alt="" loading="lazy"></figure>
 ]]></content>
     </entry>
 </feed>
