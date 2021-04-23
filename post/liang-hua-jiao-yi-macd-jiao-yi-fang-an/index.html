@@ -2,14 +2,10 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <meta name="description" content="
+    <meta name="description" content="百度百科如下定义：
 
-
-
-
-
-..." />
-    <meta name="keywords" content="markdown" />
+MACD称为异同移动平均线，是从双指数移动平均线发展而来的，由快的指数移动平均线（EMA12）减去慢的指数移动平均线（EMA26）得到快线DIF，再用2×（快线DIF-DIF的9日加权移动均线DEA）得到MACD柱。M..." />
+    <meta name="keywords" content="" />
     <link rel="stylesheet" href="https://lienguang0624.github.io//media/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://lienguang0624.github.io//styles/main.css">
     
@@ -990,25 +986,21 @@
         <div class="postshow postpadding" style="padding-bottom: 0;">
             
             <div class="postdetailimg">
-                <img src="https://lienguang0624.github.io//post-images/markdown.jpg" class="postimage" style="cursor:auto">
+                <img src="http://i2.tiimg.com/736614/293c1bab3b63676b.jpg" class="postimage" style="cursor:auto">
             </div>
             <div class="postinfo-detail">
-                <div class="postdate"><i class="fa fa-calendar"></i>2021-04-22</div>
-                <div class="poststatus postdate"><i class="fa fa-clock-o"></i> 0 min read</div>
+                <div class="postdate"><i class="fa fa-calendar"></i>2021-04-23</div>
+                <div class="poststatus postdate"><i class="fa fa-clock-o"></i> 3 min read</div>
                 <div class="posttag">
-                    
-                    <a data-pjax href="https://lienguang0624.github.io/tag/ONN9Z5wgP/" class="postlink">
-                        <i class="fa fa-tag"></i> markdown
-                    </a>
                     
                 </div>
             </div>
             
         <div id="articlecontent">
             <div id="texttitle" style="text-align: center">
-                <h2 id="ptitle">Markdown用法简介</h2>
+                <h2 id="ptitle">量化交易——MACD交易方案</h2>
                 <!-- id 将作为查询条件 -->
-                <div id="pl" style="display:none">https://lienguang0624.github.io/post/markdown/</div>
+                <div id="pl" style="display:none">https://lienguang0624.github.io/post/liang-hua-jiao-yi-macd-jiao-yi-fang-an/</div>
                 <div id="rootaddr" style="display:none">https://lienguang0624.github.io/</div>
                 <span id="hotnum">
                     <h4><i class="fa fa-eye" aria-hidden="true" style="color: #FF8C00;"></i>&nbsp;&nbsp;热度</i>: <i
@@ -1016,12 +1008,58 @@
                 </span>
             </div>
             <div class="text ">
-                <figure data-type="image" tabindex="1"><img src="https://lienguang0624.github.io//post-images/1619074934307.jpg" alt="" loading="lazy"></figure>
-<figure data-type="image" tabindex="2"><img src="https://lienguang0624.github.io//post-images/1619074942951.png" alt="" loading="lazy"></figure>
-<figure data-type="image" tabindex="3"><img src="https://lienguang0624.github.io//post-images/1619074947111.jpg" alt="" loading="lazy"></figure>
-<figure data-type="image" tabindex="4"><img src="https://lienguang0624.github.io//post-images/1619074951564.png" alt="" loading="lazy"></figure>
-<figure data-type="image" tabindex="5"><img src="https://lienguang0624.github.io//post-images/1619074955112.png" alt="" loading="lazy"></figure>
-<figure data-type="image" tabindex="6"><img src="https://lienguang0624.github.io//post-images/1619074958798.png" alt="" loading="lazy"></figure>
+                <p>百度百科如下定义：</p>
+<blockquote>
+<p>MACD称为异同移动平均线，是从双指数移动平均线发展而来的，由快的指数移动平均线（EMA12）减去慢的指数移动平均线（EMA26）得到快线DIF，再用2×（快线DIF-DIF的9日加权移动均线DEA）得到MACD柱。MACD的意义和双移动平均线基本相同，即由快、慢均线的离散、聚合表征当前的多空状态和股价可能的发展变化趋势，但阅读起来更方便。MACD的变化代表着市场趋势的变化，不同K线级别的MACD代表当前级别周期中的买卖趋势。</p>
+</blockquote>
+<p>简单来说，MACD指标是由两线一柱组合起来形成，快速线（白色线）为DIF，慢速线（黄色线）为DEA，柱状图为MACD。</p>
+<p><strong>基本交易逻辑：</strong><br>
+1.当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)并向上移动时，一般表示为行情处于多头行情中，可以买入开仓或多头持仓；<br>
+2.当DIF和DEA均小于0(即在图形上表示为它们处于零线以下)并向下移动时，一般表示为行情处于空头行情中，可以卖出开仓或观望。<br>
+3.当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)但都向下移动时，一般表示为行情处于下跌阶段，可以卖出开仓和观望；<br>
+4.当DIF和DEA均小于0时(即在图形上表示为它们处于零线以下)但向上移动时，一般表示为行情即将上涨，股票将上涨，可以买入开仓或多头持仓。</p>
+<p><strong>量化交易逻辑：</strong></p>
+<pre><code class="language-python">#MACD判断买点
+def macd_buy_flag_function(bar,dea_sub_dif_current):
+    if len(bar) &lt; 100:		# 如果K线数组长度太小，就直接返回跳过
+        return
+    macd = TA.MACD(bar, 12, 26, 9)  		# 计算MACD值
+    dif = macd[0][-2]  					# 获取DIF的值
+    dea = macd[1][-2]  					# 获取DEA的值
+    
+    # macd买入指标判断 DEA-DIF最大时买入
+    dea_sub_dif_new = dea-dif
+    if dea_sub_dif_new &gt; 20 and (dea_sub_dif_new - dea_sub_dif_current) &lt; 0:
+        macd_buy_flag = True # 交易标志位置1    
+    else:
+        macd_buy_flag = False
+    dif_buy_current = dif  
+    dea_sub_dif_current = dea_sub_dif_new #当前DEA-DIF记为历史
+    return macd_buy_flag,dif_buy_current,dea_sub_dif_current
+
+#MACD判断卖点
+def macd_sell_flag_function(bar,dif_sub_dea_current,dif_buy_current):
+    if len(bar) &lt; 100:		# 如果K线数组长度太小，就直接返回跳过
+        return
+    macd = TA.MACD(bar, 12, 26, 9)  		# 计算MACD值
+    dif = macd[0][-2]  					# 获取DIF的值
+    dea = macd[1][-2]  					# 获取DEA的值
+    # macd卖出指标判断 dif-dea最大时卖出 
+    dif_sub_dea_new = dif-dea
+    # dif上升超过30 DIF-DEA达到波峰 关键调节点dif-dif_buy_current
+    # if (dif-dif_buy_current)&gt;20 and dif_sub_dea_new &gt; 0 and (dif_sub_dea_new - dif_sub_dea_current) &lt; 0:
+
+    if dif_sub_dea_new &gt; 20 and (dif_sub_dea_new - dif_sub_dea_current) &lt; 0:
+        macd_sell_flag = True
+    else:
+        macd_sell_flag = False
+    dif_sub_dea_current = dif_sub_dea_new#当前DIF-DEA记为历史
+    return macd_sell_flag,dif_sub_dea_current
+</code></pre>
+<p><strong>未来研究方向：</strong></p>
+<ol>
+<li>不同K线级别MACD交易策略融合</li>
+</ol>
 
             </div>
             <hr style="width: 80%;">
@@ -1059,25 +1097,37 @@
             <div class="postfooter">
                 <ul class="post-copyright">
                     <li><strong>文章作者：</strong>lienguang0624</li>
-            <li><strong>原文链接：</strong>https://lienguang0624.github.io/post/markdown/</li>
+            <li><strong>原文链接：</strong>https://lienguang0624.github.io/post/liang-hua-jiao-yi-macd-jiao-yi-fang-an/</li>
             <li><strong>版权声明：</strong>本博客所有文章除特别声明外，均采用<i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA
                 许可协议。转载请注明出处！</li>
             </ul>
         </div>
         <div id="otherpost">
             
-            <a  data-pjax class="prev-post-pc" href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-fa-ming-zhe-ping-tai-chang-yong-api/"  style="color: black;">
+            <a  data-pjax class="prev-post-pc" href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-fmz-ping-tai-jiao-yi-kuang-jia/"  style="color: black;">
                 <div id="ppcontainer">
+                    
+                    <img src="http://i2.tiimg.com/736614/9a3fcf5a20b61286.jpg" style="width: 100%;" class="opimg">
+                    
+                    <h4 class="optitle">量化交易——FMZ平台交易框架</h4>
+                </div>
+            </a>
+            <div class="prev-post">
+                上一篇 <a  data-pjax href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-fmz-ping-tai-jiao-yi-kuang-jia/">量化交易——FMZ平台交易框架</a>
+            </div>
+            
+            
+            <a data-pjax class="next-post-pc" href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-fa-ming-zhe-ping-tai-chang-yong-api/"  style="color: black;">
+                <div id="npcontainer">
                     
                     <img src="http://i2.tiimg.com/736614/376cb89ec24a16f2.jpg" style="width: 100%;" class="opimg">
                     
                     <h4 class="optitle">量化交易——发明者平台常用API</h4>
                 </div>
             </a>
-            <div class="prev-post">
-                上一篇 <a  data-pjax href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-fa-ming-zhe-ping-tai-chang-yong-api/">量化交易——发明者平台常用API</a>
+            <div class="next-post">
+                下一篇 <a  data-pjax href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-fa-ming-zhe-ping-tai-chang-yong-api/">量化交易——发明者平台常用API</a>
             </div>
-            
             
         </div>
     </div>

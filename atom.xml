@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://lienguang0624.github.io/</id>
     <title>LightHunter</title>
-    <updated>2021-04-22T10:36:15.111Z</updated>
+    <updated>2021-04-23T09:12:58.988Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://lienguang0624.github.io/"/>
     <link rel="self" href="https://lienguang0624.github.io/atom.xml"/>
@@ -10,6 +10,207 @@
     <logo>https://lienguang0624.github.io/images/avatar.png</logo>
     <icon>https://lienguang0624.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, LightHunter</rights>
+    <entry>
+        <title type="html"><![CDATA[量化交易——FMZ平台交易框架]]></title>
+        <id>https://lienguang0624.github.io/post/liang-hua-jiao-yi-fmz-ping-tai-jiao-yi-kuang-jia/</id>
+        <link href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-fmz-ping-tai-jiao-yi-kuang-jia/">
+        </link>
+        <updated>2021-04-23T07:45:07.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="现货交易基本框架概览">现货交易基本框架概览</h1>
+<pre><code class="language-python">def main():
+    btc_sell_flag = False #btc买入标志位（测试用）
+    btc_buy_flag = False #btc卖出标志位（测试用）
+
+    #交易策略所需参数 本次案例为MACD相关定义参数
+    dea_sub_dif_new = 0
+    dea_sub_dif_current = 0
+    dif_sub_dea_new = 0
+    dif_sub_dea_current = 0
+    dif_buy_current = 0
+    macd_buy_flag = False
+    macd_sell_flag = False
+
+    # 交易标志位设定
+    BUY_FLAG = False
+    SELL_FLAG = False
+    ALREADY_BUY_FLAG = False
+    ALREADY_SELL_FLAG = True
+
+    while True:
+        account = exchange.GetAccount()
+        Balance = account.Balance #USTD剩余
+        Stocks = account.Stocks #BTC剩余
+        bar = exchange.GetRecords(60) 	# 获取K线数组
+        #可否满足买入综合判定
+        macd_buy_flag,dif_buy_current,dea_sub_dif_current = macd_buy_flag_function(bar,dea_sub_dif_current)
+        macd_sell_flag,dif_sub_dea_current = macd_sell_flag_function(bar,dif_sub_dea_current,dif_buy_current)
+
+        if macd_buy_flag == True :
+            BUY_FLAG = True
+            SELL_FLAG = False
+        #可否满足卖出综合判定
+        if macd_sell_flag == True :
+            BUY_FLAG = False
+            SELL_FLAG = True
+        
+        if BUY_FLAG and ALREADY_BUY_FLAG == False:
+            exchange.Buy(-1, (Balance-1))#USTD剩余全仓买入
+            ALREADY_BUY_FLAG = True
+            ALREADY_SELL_FLAG = False
+            BUY_FLAG = False
+            macd_buy_flag = False
+
+        if SELL_FLAG and ALREADY_SELL_FLAG == False:
+            Log(&quot;round(Stocks,6):&quot;,round(Stocks,6))
+            exchange.Sell(-1, (round(Stocks,6)-0.000001))
+            ALREADY_SELL_FLAG = True
+            ALREADY_BUY_FLAG = False
+            SELL_FLAG = False
+            macd_sell_flag = False
+            
+        #标志位重置    
+        BUY_FLAG = False
+        SELL_FLAG = False
+        macd_buy_flag = False
+        macd_sell_flag = False
+#买入数额和卖出数额有问题
+        Sleep(1000)
+</code></pre>
+<h1 id="框架解释说明">框架解释说明</h1>
+<ol>
+<li>进入主函数后首先定义本次策略所需变量，并进行初始化，也就是如下这一部分，该处的变量随策略的改变而发生改变</li>
+</ol>
+<pre><code class="language-python">    #交易策略所需参数 本次案例为MACD相关定义参数
+    dea_sub_dif_new = 0
+    dea_sub_dif_current = 0
+    dif_sub_dea_new = 0
+    dif_sub_dea_current = 0
+    dif_buy_current = 0
+    macd_buy_flag = False
+    macd_sell_flag = False
+
+    # 交易标志位设定
+    BUY_FLAG = False
+    SELL_FLAG = False
+    ALREADY_BUY_FLAG = False
+    ALREADY_SELL_FLAG = True
+</code></pre>
+<ol start="2">
+<li>而后进入while循环，首先在每一次循环的初始时刻调出当前仓位，余额，K线图</li>
+</ol>
+<pre><code class="language-python">    while True:
+        account = exchange.GetAccount()
+        Balance = account.Balance #USTD剩余
+        Stocks = account.Stocks #BTC剩余
+        bar = exchange.GetRecords(60) 	# 获取K线数组
+</code></pre>
+<ol start="3">
+<li>而后根据不同策略判断当前是否符合该策略的买/卖点,并返回该策略买卖标志位（macd_buy_flag），以及下一次循环可能用到的变量（dif_buy_current,dea_sub_dif_current）</li>
+</ol>
+<pre><code class="language-python">        #可否满足买入综合判定
+        macd_buy_flag,dif_buy_current,dea_sub_dif_current = macd_buy_flag_function(bar,dea_sub_dif_current)
+        macd_sell_flag,dif_sub_dea_current = macd_sell_flag_function(bar,dif_sub_dea_current,dif_buy_current)
+</code></pre>
+<ol start="4">
+<li>根据各类策略进行融合，综合判定是否可以进行买卖操作，并对整个系统的买卖标志位进行赋值：</li>
+</ol>
+<pre><code class="language-python">        if macd_buy_flag == True :
+            BUY_FLAG = True
+            SELL_FLAG = False
+
+        if macd_sell_flag == True :
+            BUY_FLAG = False
+            SELL_FLAG = True
+</code></pre>
+<ol start="5">
+<li>根据整个系统的买卖标志位进行决定是否进行买入卖出操作，由于交易系统有小数后位数限制，所以使用round()函数进行精度控制。需要注意的是exchange.Buy()函数接受的为USDT单位，exchange.Sell()函数接受的为BTC单位</li>
+</ol>
+<pre><code class="language-python">        if BUY_FLAG and ALREADY_BUY_FLAG == False:
+            exchange.Buy(-1, (Balance-1))#USTD剩余全仓买入
+            ALREADY_BUY_FLAG = True
+            ALREADY_SELL_FLAG = False
+            BUY_FLAG = False
+            macd_buy_flag = False
+
+        if SELL_FLAG and ALREADY_SELL_FLAG == False:
+            Log(&quot;round(Stocks,6):&quot;,round(Stocks,6))
+            exchange.Sell(-1, (round(Stocks,6)-0.000001))
+            ALREADY_SELL_FLAG = True
+            ALREADY_BUY_FLAG = False
+            SELL_FLAG = False
+            macd_sell_flag = False
+</code></pre>
+<ol start="6">
+<li>最后在循环结束前对相关标志位进行复位</li>
+</ol>
+<pre><code class="language-python">        #标志位重置    
+        BUY_FLAG = False
+        SELL_FLAG = False
+        macd_buy_flag = False
+        macd_sell_flag = False
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[量化交易——MACD交易方案]]></title>
+        <id>https://lienguang0624.github.io/post/liang-hua-jiao-yi-macd-jiao-yi-fang-an/</id>
+        <link href="https://lienguang0624.github.io/post/liang-hua-jiao-yi-macd-jiao-yi-fang-an/">
+        </link>
+        <updated>2021-04-23T07:17:30.000Z</updated>
+        <content type="html"><![CDATA[<p>百度百科如下定义：</p>
+<blockquote>
+<p>MACD称为异同移动平均线，是从双指数移动平均线发展而来的，由快的指数移动平均线（EMA12）减去慢的指数移动平均线（EMA26）得到快线DIF，再用2×（快线DIF-DIF的9日加权移动均线DEA）得到MACD柱。MACD的意义和双移动平均线基本相同，即由快、慢均线的离散、聚合表征当前的多空状态和股价可能的发展变化趋势，但阅读起来更方便。MACD的变化代表着市场趋势的变化，不同K线级别的MACD代表当前级别周期中的买卖趋势。</p>
+</blockquote>
+<p>简单来说，MACD指标是由两线一柱组合起来形成，快速线（白色线）为DIF，慢速线（黄色线）为DEA，柱状图为MACD。</p>
+<p><strong>基本交易逻辑：</strong><br>
+1.当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)并向上移动时，一般表示为行情处于多头行情中，可以买入开仓或多头持仓；<br>
+2.当DIF和DEA均小于0(即在图形上表示为它们处于零线以下)并向下移动时，一般表示为行情处于空头行情中，可以卖出开仓或观望。<br>
+3.当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)但都向下移动时，一般表示为行情处于下跌阶段，可以卖出开仓和观望；<br>
+4.当DIF和DEA均小于0时(即在图形上表示为它们处于零线以下)但向上移动时，一般表示为行情即将上涨，股票将上涨，可以买入开仓或多头持仓。</p>
+<p><strong>量化交易逻辑：</strong></p>
+<pre><code class="language-python">#MACD判断买点
+def macd_buy_flag_function(bar,dea_sub_dif_current):
+    if len(bar) &lt; 100:		# 如果K线数组长度太小，就直接返回跳过
+        return
+    macd = TA.MACD(bar, 12, 26, 9)  		# 计算MACD值
+    dif = macd[0][-2]  					# 获取DIF的值
+    dea = macd[1][-2]  					# 获取DEA的值
+    
+    # macd买入指标判断 DEA-DIF最大时买入
+    dea_sub_dif_new = dea-dif
+    if dea_sub_dif_new &gt; 20 and (dea_sub_dif_new - dea_sub_dif_current) &lt; 0:
+        macd_buy_flag = True # 交易标志位置1    
+    else:
+        macd_buy_flag = False
+    dif_buy_current = dif  
+    dea_sub_dif_current = dea_sub_dif_new #当前DEA-DIF记为历史
+    return macd_buy_flag,dif_buy_current,dea_sub_dif_current
+
+#MACD判断卖点
+def macd_sell_flag_function(bar,dif_sub_dea_current,dif_buy_current):
+    if len(bar) &lt; 100:		# 如果K线数组长度太小，就直接返回跳过
+        return
+    macd = TA.MACD(bar, 12, 26, 9)  		# 计算MACD值
+    dif = macd[0][-2]  					# 获取DIF的值
+    dea = macd[1][-2]  					# 获取DEA的值
+    # macd卖出指标判断 dif-dea最大时卖出 
+    dif_sub_dea_new = dif-dea
+    # dif上升超过30 DIF-DEA达到波峰 关键调节点dif-dif_buy_current
+    # if (dif-dif_buy_current)&gt;20 and dif_sub_dea_new &gt; 0 and (dif_sub_dea_new - dif_sub_dea_current) &lt; 0:
+
+    if dif_sub_dea_new &gt; 20 and (dif_sub_dea_new - dif_sub_dea_current) &lt; 0:
+        macd_sell_flag = True
+    else:
+        macd_sell_flag = False
+    dif_sub_dea_current = dif_sub_dea_new#当前DIF-DEA记为历史
+    return macd_sell_flag,dif_sub_dea_current
+</code></pre>
+<p><strong>未来研究方向：</strong></p>
+<ol>
+<li>不同K线级别MACD交易策略融合</li>
+</ol>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[量化交易——发明者平台常用API]]></title>
         <id>https://lienguang0624.github.io/post/liang-hua-jiao-yi-fa-ming-zhe-ping-tai-chang-yong-api/</id>
